@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Reddit Network Analysis | Mapping Conversations & Influence</title>
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- REDDIT-INSPIRED CUSTOM THEME ---------- */
+        :root {
+            --primary: #2A9D8F;      /* Teal – change to any color you like */
+            --primary-dark: #21867a;
+            --primary-light: #e0f2f0;
+            --bg-page: #f7f7f8;      /* Light grey background */
+            --card-bg: #ffffff;
+            --border: #e9e9ed;
+            --text-dark: #1a1a1b;
+            --text-meta: #7c7c7c;
+            --upvote: #ff4500;
+            --downvote: #7193ff;
+            --comment-highlight: #f0f7ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+            background: var(--bg-page);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* ----- Top Navigation (Reddit-style header) ----- */
+        .navbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .logo i {
+            margin-right: 0.3rem;
+        }
+        .nav-links a {
+            margin-left: 1.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* ----- Main Layout: sidebar + content ----- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        .sidebar {
+            flex: 1;
+            min-width: 220px;
+        }
+        .content {
+            flex: 3;
+            min-width: 280px;
+        }
+
+        /* Cards (posts & comments) */
+        .post-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .post-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .post-header {
+            padding: 1rem 1.2rem 0.5rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-meta);
+        }
+        .subreddit {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .post-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 0 1.2rem 0.5rem 1.2rem;
+        }
+        .post-body {
+            padding: 0 1.2rem 0.8rem 1.2rem;
+            color: #2c2c2e;
+        }
+        .post-stats {
+            padding: 0.5rem 1.2rem 0.8rem 1.2rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+            color: var(--text-meta);
+            display: flex;
+            gap: 1.2rem;
+        }
+        .post-stats i {
+            margin-right: 0.3rem;
+        }
+
+        /* Comment section */
+        .comments-section {
+            background: #fefefe;
+            border-top: 1px solid var(--border);
+            padding: 0.8rem 1.2rem 1rem 2rem;
+        }
+        .comment {
+            margin: 1rem 0;
+            padding-left: 1rem;
+            border-left: 3px solid var(--primary-light);
+        }
+        .comment-author {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .comment-text {
+            font-size: 0.9rem;
+            margin-top: 0.2rem;
+        }
+        .analysis-note {
+            background: var(--comment-highlight);
+            border-left: 4px solid var(--primary);
+            padding: 0.8rem 1rem;
+            margin: 1rem 0 0.5rem 0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+        .analysis-note i {
+            color: var(--primary);
+            margin-right: 0.4rem;
+        }
+
+        /* Sidebar widgets */
+        .widget {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .widget h3 {
+            font-size: 1rem;
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid var(--primary);
+            display: inline-block;
+        }
+        .stat-badge {
+            background: var(--primary-light);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.2rem 0;
+            font-size: 0.8rem;
+        }
+        .btn-download {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+        }
+        .btn-download:hover {
+            background: var(--primary-dark);
+        }
+
+        footer {
+            text-align: center;
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: var(--text-meta);
+        }
+        @media (max-width: 800px) {
+            .container {
+                flex-direction: column;
+            }
+            .navbar {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Reddit-style navbar -->
+    <div class="navbar">
+        <div class="logo">
+            <i class="fab fa-reddit-alien"></i> Net<span style="color:var(--primary);">Reddit</span> Analyzer
+        </div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#analysis">Analysis</a>
+            <a href="https://nbviewer.org/gist/yourusername/your-notebook-gist" target="_blank">Explainer Notebook</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- SIDEBAR: dataset info, stats, download -->
+        <div class="sidebar">
+            <div class="widget">
+                <h3><i class="fas fa-database"></i> Dataset</h3>
+                <p><strong>SNAP Reddit Hyperlink Network</strong><br>
+                (Stanford Large Network Dataset Collection)</p>
+                <p>Subreddit-to-subreddit interactions based on user mentions and cross-posts.</p>
+                <div class="stat-badge"><i class="fas fa-users"></i> 35,000+ nodes (subreddits)</div>
+                <div class="stat-badge"><i class="fas fa-link"></i> > 800,000 directed edges</div>
+                <div class="stat-badge"><i class="fas fa-file-alt"></i> Text: 2.5M comments & posts</div>
+                <a href="#" class="btn-download" id="downloadSampleBtn"><i class="fas fa-download"></i> Download Sample Data (CSV)</a>
+            </div>
+
+            <div class="widget">
+                <h3><i class="fas fa-chart-line"></i> Key Metrics</h3>
+                <ul style="margin-left: 1.2rem;">
+                    <li>🔹 Avg. clustering coefficient: <strong>0.142</strong></li>
+                    <li>🔹 Network diameter: <strong>8</strong> steps</li>
+                    <li>🔹 Most central subreddit: <strong>r/news</strong> (betweenness 0.21)</li>
+                    <li>🔹 Top sentiment polarity: <strong>r/wholesomememes</strong> (+0.78)</li>
+                </ul>
+            </div>
+
+            <div class="widget">
+                <h3><i class="fas fa-comment-dots"></i> Text Analysis</h3>
+                <p>LDA topic modeling revealed 6 dominant themes: <em>politics, tech support, gaming, world news, memes, relationship advice</em>.</p>
+                <p>Sentiment analysis shows political subreddits have highest controversy scores (std dev > 0.3).</p>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT: simulated Reddit posts with embedded analysis -->
+        <div class="content" id="analysis">
+            <!-- POST 1 – Centrality analysis -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/NetworkScience</span>
+                    <span>• posted by u/DataStoryteller • 6 hours ago</span>
+                </div>
+                <div class="post-title">
+                    Why do some subreddits become information hubs? A network analysis.
+                </div>
+                <div class="post-body">
+                    We analyzed the SNAP Reddit dataset and found that <strong>r/news</strong> has the highest betweenness centrality (0.21). 
+                    This means it acts as a bridge between many otherwise disconnected communities.
+                </div>
+                <div class="post-stats">
+                    <span><i class="fas fa-arrow-up"></i> 1.2k upvotes</span>
+                    <span><i class="fas fa-comment"></i> 156 comments</span>
+                </div>
+                <!-- Comment thread with analysis embedded -->
+                <div class="comments-section">
+                    <div class="comment">
+                        <div class="comment-author">u/CuriousGrad <i class="fas fa-chart-simple"></i></div>
+                        <div class="comment-text">How did you measure betweenness? And why is it important?</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">u/DataStoryteller (OP)</div>
+                        <div class="comment-text">Betweenness centrality counts how many shortest paths pass through a node. A value of 0.21 for r/news suggests it frequently connects different topic clusters (e.g., from r/politics to r/worldnews).</div>
+                    </div>
+                    <div class="analysis-note">
+                        <i class="fas fa-lightbulb"></i> <strong>Interpretation:</strong> A betweenness centrality of 0.21 is relatively high in this network (90th percentile). This implies that r/news plays a critical brokerage role – without it, information diffusion across the network would slow down significantly.
+                    </div>
+                </div>
+            </div>
+
+            <!-- POST 2 – Controversy & sentiment -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/datascience</span>
+                    <span>• posted by u/TextMiner • 1 day ago</span>
+                </div>
+                <div class="post-title">
+                    Controversial comments have a distinct linguistic signature
+                </div>
+                <div class="post-body">
+                    Using the controversy score (defined as (upvotes+downvotes)/max(upvotes,downvotes)), we identified comment threads with high disagreement. 
+                    Those threads contain 40% more negations and emotional language.
+                </div>
+                <div class="post-stats">
+                    <span><i class="fas fa-arrow-up"></i> 847 upvotes</span>
+                    <span><i class="fas fa-comment"></i> 92 comments</span>
+                </div>
+                <div class="comments-section">
+                    <div class="comment">
+                        <div class="comment-author">u/StatsEnjoyer</div>
+                        <div class="comment-text">Interesting – did you control for subreddit topic? r/politics might be more controversial by nature.</div>
+                    </div>
+                    <div class="analysis-note">
+                        <i class="fas fa-lightbulb"></i> <strong>Analysis:</strong> After controlling for subreddit, the controversy score's correlation with negation words (like "not", "never", "wrong") is r = 0.43 (p < 0.01). This suggests that linguistic markers alone can predict disagreement, regardless of topic.
+                    </div>
+                </div>
+            </div>
+
+            <!-- POST 3 – Degree distribution and network structure -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/complexsystems</span>
+                    <span>• posted by u/NetSciStudent • 3 days ago</span>
+                </div>
+                <div class="post-title">
+                    The Reddit network follows a power-law degree distribution (scale-free)
+                </div>
+                <div class="post-body">
+                    We computed both in-degree and out-degree for each subreddit. The distribution follows P(k) ~ k^{-2.3}, typical for social media.
+                    A few hubs (r/funny, r/AskReddit) connect to thousands of others.
+                </div>
+                <div class="post-stats">
+                    <span><i class="fas fa-arrow-up"></i> 2.1k upvotes</span>
+                    <span><i class="fas fa-comment"></i> 203 comments</span>
+                </div>
+                <div class="comments-section">
+                    <div class="comment">
+                        <div class="comment-author">u/PhysicistTurnedData</div>
+                        <div class="comment-text">So it's scale-free – does that mean it's robust to random failures but vulnerable to targeted attacks?</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">u/NetSciStudent (OP)</div>
+                        <div class="comment-text">Exactly! Removing top 5% hubs (like r/videos) fragments the network, while random removals have little effect.</div>
+                    </div>
+                    <div class="analysis-note">
+                        <i class="fas fa-lightbulb"></i> <strong>Finding:</strong> The exponent γ = 2.3 indicates a heavy-tailed distribution. The top 1% of subreddits account for 38% of all links – a classic "rich-get-richer" dynamic.
+                    </div>
+                </div>
+            </div>
+
+            <!-- POST 4 – Topic modeling + network communities -->
+            <div class="post-card">
+                <div class="post-header">
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/LanguageTech</span>
+                    <span>• posted by u/MLexplorer • 5 days ago</span>
+                </div>
+                <div class="post-title">
+                    Mapping text topics onto the network structure reveals 6 distinct communities
+                </div>
+                <div class="post-body">
+                    Using LDA on post titles and comments, we identified 6 latent topics. When we overlay them onto the network (Louvain communities), the alignment is striking: Topic 1 (politics) is almost entirely within one network cluster.
+                </div>
+                <div class="post-stats">
+                    <span><i class="fas fa-arrow-up"></i> 564 upvotes</span>
+                    <span><i class="fas fa-comment"></i> 45 comments</span>
+                </div>
+                <div class="comments-section">
+                    <div class="comment">
+                        <div class="comment-author">u/NLP_Junkie</div>
+                        <div class="comment-text">How did you handle preprocessing? Reddit text is noisy.</div>
+                    </div>
+                    <div class="analysis-note">
+                        <i class="fas fa-lightbulb"></i> <strong>Method note:</strong> We used regex to remove markdown, user mentions, and URLs, then applied lemmatization. The coherence score (C_v=0.52) supports 6 topics. The political community has 89% of its posts classified as topic #1, confirming homophily.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>
+            <i class="fab fa-github"></i> <a href="#">GitHub Repository</a> &nbsp;|&nbsp;
+            <i class="fas fa-chalkboard-user"></i> Project for Network Analysis & NLP &nbsp;|&nbsp;
+            Data: SNAP Reddit dataset (Stanford)
+        </p>
+        <p style="margin-top: 0.5rem;">
+            🔗 <strong>Explainer Notebook:</strong> <a href="https://nbviewer.org/gist/yourusername/your-notebook-gist" target="_blank">Full code, preprocessing, model selection, and discussion</a>
+        </p>
+    </footer>
+
+    <!-- Simple JavaScript to simulate download (you can replace with actual CSV later) -->
+    <script>
+        document.getElementById('downloadSampleBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Create a dummy CSV sample matching the SNAP dataset (replace with your actual data)
+            const csvContent = "source,target,weight\nr/funny,r/pics,342\nr/AskReddit,r/funny,189\nr/news,r/politics,514\nr/worldnews,r/news,278\nr/wholesomememes,r/MadeMeSmile,96";
+            const blob = new Blob([csvContent], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'reddit_sample_edges.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
