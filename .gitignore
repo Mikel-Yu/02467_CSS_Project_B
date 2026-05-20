@@ -1,0 +1,19 @@
+# Raw SNAP TSVs (~700 MB) — fetched via the wget commands in the README.
+data/
+
+# (figs/ is INTENTIONALLY tracked — the website embeds the PNGs by relative path.)
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# uv / virtualenv
+.venv/
+.python-version
+
+# OS
+.DS_Store
