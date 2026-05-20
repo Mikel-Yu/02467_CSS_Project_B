@@ -53,8 +53,8 @@ Expect ~10 minutes runtime. The notebook writes figures to `figs/` and a machine
 
 ## Authors & contribution statement
 
-- **Poul Guoskov** — Network analysis (degree distribution, ER baseline, components, centrality), community detection (Louvain) and assortativity, notebook structure and code, write-up of the network sections.
-- **Mikel** — Dataset selection and preprocessing, sentiment landscape, LIWC / VADER feature analysis, TF-IDF on subreddit names, website design and implementation, GitHub Pages deployment.
+- **Poul Guo Skov** — Network analysis (degree distribution, ER baseline, components, centrality), community detection (Louvain) and assortativity, notebook structure and code, write-up of the network sections.
+- **Mikel Taotao Yu** — Dataset selection and preprocessing, sentiment landscape, LIWC / VADER feature analysis, TF-IDF on subreddit names, website design and implementation, GitHub Pages deployment.
 - *Jointly* — Research question, interpretation of results, discussion, references.
 
 ## Dataset & references
