@@ -192,10 +192,20 @@
             border-radius: 20px;
             text-decoration: none;
             font-size: 0.8rem;
-            margin-top: 0.8rem;
+            margin-top: 0.4rem;
+            margin-right: 0.4rem;
         }
         .btn-download:hover {
             background: var(--primary-dark);
+        }
+        .widget-downloads .btn-download {
+            display: block;
+        }
+        .post-fig {
+            width: 100%;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+            border: 1px solid var(--border);
         }
 
         footer {
@@ -226,7 +236,7 @@
         <div class="nav-links">
             <a href="#">Home</a>
             <a href="#analysis">Analysis</a>
-            <a href="https://nbviewer.org/gist/yourusername/your-notebook-gist" target="_blank">Explainer Notebook</a>
+            <a href="https://nbviewer.org/github/mikel-yu/02467_CSS_Project_B/blob/main/Project_B_Explainer.ipynb" target="_blank">Explainer Notebook</a>
         </div>
     </div>
 
@@ -235,79 +245,88 @@
         <div class="sidebar">
             <div class="widget">
                 <h3><i class="fas fa-database"></i> Dataset</h3>
-                <p><strong>SNAP Reddit Hyperlink Network</strong><br>
-                (Stanford Large Network Dataset Collection)</p>
-                <p>Subreddit-to-subreddit interactions based on user mentions and cross-posts.</p>
-                <div class="stat-badge"><i class="fas fa-users"></i> 35,000+ nodes (subreddits)</div>
-                <div class="stat-badge"><i class="fas fa-link"></i> > 800,000 directed edges</div>
-                <div class="stat-badge"><i class="fas fa-file-alt"></i> Text: 2.5M comments & posts</div>
-                <a href="#" class="btn-download" id="downloadSampleBtn"><i class="fas fa-download"></i> Download Sample Data (CSV)</a>
+                <p><strong>SNAP Reddit Hyperlinks</strong><br>
+                Kumar et al., WWW 2018 — subreddit-to-subreddit hyperlinks with pre-labeled +1/−1 sentiment.</p>
+                <div class="stat-badge"><i class="fas fa-users"></i> 67,180 subreddits</div>
+                <div class="stat-badge"><i class="fas fa-link"></i> 858,488 hyperlinks</div>
+                <div class="stat-badge"><i class="fas fa-arrows-left-right-to-line"></i> 339,643 unique directed pairs</div>
+                <div class="stat-badge"><i class="fas fa-calendar-days"></i> Jan 2014 – Apr 2017</div>
+                <div class="stat-badge"><i class="fas fa-file-alt"></i> 2 TSVs · 86 LIWC/VADER features per post</div>
             </div>
 
             <div class="widget">
                 <h3><i class="fas fa-chart-line"></i> Key Metrics</h3>
                 <ul style="margin-left: 1.2rem;">
-                    <li>🔹 Avg. clustering coefficient: <strong>0.142</strong></li>
-                    <li>🔹 Network diameter: <strong>8</strong> steps</li>
-                    <li>🔹 Most central subreddit: <strong>r/news</strong> (betweenness 0.21)</li>
-                    <li>🔹 Top sentiment polarity: <strong>r/wholesomememes</strong> (+0.78)</li>
+                    <li>🔹 Power-law tail: <strong>γ<sub>in</sub> = 2.14</strong>, <strong>γ<sub>out</sub> = 2.24</strong> (R² &gt; 0.98)</li>
+                    <li>🔹 Largest weakly-connected component: <strong>97.7%</strong> of nodes</li>
+                    <li>🔹 Top hub by in-degree: <strong>r/askreddit</strong> (5,448 incoming links)</li>
+                    <li>🔹 Top bridge by betweenness: <strong>r/subredditdrama</strong> (0.038)</li>
+                    <li>🔹 Louvain modularity: <strong>Q = 0.549</strong> across 801 communities</li>
+                    <li>🔹 Hostile-link share: <strong>9.5%</strong> (near-constant 2014–17)</li>
                 </ul>
             </div>
 
             <div class="widget">
                 <h3><i class="fas fa-comment-dots"></i> Text Analysis</h3>
-                <p>LDA topic modeling revealed 6 dominant themes: <em>politics, tech support, gaming, world news, memes, relationship advice</em>.</p>
-                <p>Sentiment analysis shows political subreddits have highest controversy scores (std dev > 0.3).</p>
+                <p>We run <strong>TF-IDF over subreddit names per community</strong> (the SNAP release only ships LIWC/VADER features, not raw post text). Top tokens cleanly label each cluster: <em>donald/trump/politics</em>, <em>battlefield/gaming/ps4</em>, <em>science/space/brain</em>, <em>history/europe/eu</em>.</p>
+                <p>On hostile vs friendly hyperlinks: <strong>VADER compound</strong> flips sign — <strong>−0.32 vs +0.15</strong> — and VADER-negative is roughly 4× higher in hostile posts.</p>
+            </div>
+
+            <div class="widget widget-downloads">
+                <h3><i class="fas fa-download"></i> Downloads</h3>
+                <p>Grab the raw data and reproduce the analysis end-to-end:</p>
+                <a href="https://snap.stanford.edu/data/soc-redditHyperlinks-title.tsv" class="btn-download"><i class="fas fa-file-csv"></i> SNAP title TSV (369 MB)</a>
+                <a href="https://snap.stanford.edu/data/soc-redditHyperlinks-body.tsv" class="btn-download"><i class="fas fa-file-csv"></i> SNAP body TSV (319 MB)</a>
+                <a href="https://github.com/mikel-yu/02467_CSS_Project_B/blob/main/metrics.json" class="btn-download"><i class="fas fa-file-code"></i> metrics.json (this site)</a>
+                <a href="https://github.com/mikel-yu/02467_CSS_Project_B" class="btn-download"><i class="fab fa-github"></i> Full source on GitHub</a>
             </div>
         </div>
 
         <!-- MAIN CONTENT: simulated Reddit posts with embedded analysis -->
         <div class="content" id="analysis">
-            <!-- POST 1 – Centrality analysis -->
+            <!-- POST 1 — Scale-free degree distribution -->
             <div class="post-card">
                 <div class="post-header">
                     <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/NetworkScience</span>
                     <span>• posted by u/DataStoryteller • 6 hours ago</span>
                 </div>
                 <div class="post-title">
-                    Why do some subreddits become information hubs? A network analysis.
+                    The Reddit hyperlink network is heavily skewed — γ ≈ 2.2 power-law tail
                 </div>
                 <div class="post-body">
-                    We analyzed the SNAP Reddit dataset and found that <strong>r/news</strong> has the highest betweenness centrality (0.21). 
-                    This means it acts as a bridge between many otherwise disconnected communities.
+                    We turned 858,488 cross-subreddit hyperlinks (Kumar et al., SNAP, 2014–2017) into a directed graph: <strong>67,180 subreddits</strong>, <strong>339,643 unique directed pairs</strong>, density 7.5 × 10⁻⁵. Fitting a power law to the tail (k ≥ 10) gives <strong>γ<sub>in</sub> = 2.14</strong> and <strong>γ<sub>out</sub> = 2.24</strong>, both with R² &gt; 0.98, well inside the 2 to 3 range typical of online social networks. An equally-sized Erdős–Rényi random graph would peak around ⟨k⟩ ≈ 5 and fall off Poisson-like by k ≈ 15; the real curve reaches k = 5,448 (r/askreddit) and never decays cleanly.
+                    <img src="figs/degree_distribution.png" alt="Log-log in- and out-degree distributions of the Reddit hyperlink network, with ER baseline and fitted power law" class="post-fig">
                 </div>
                 <div class="post-stats">
                     <span><i class="fas fa-arrow-up"></i> 1.2k upvotes</span>
                     <span><i class="fas fa-comment"></i> 156 comments</span>
                 </div>
-                <!-- Comment thread with analysis embedded -->
                 <div class="comments-section">
                     <div class="comment">
                         <div class="comment-author">u/CuriousGrad <i class="fas fa-chart-simple"></i></div>
-                        <div class="comment-text">How did you measure betweenness? And why is it important?</div>
+                        <div class="comment-text">A γ between 2 and 3 means infinite variance in the infinite-N limit. Does that show up in your data?</div>
                     </div>
                     <div class="comment">
                         <div class="comment-author">u/DataStoryteller (OP)</div>
-                        <div class="comment-text">Betweenness centrality counts how many shortest paths pass through a node. A value of 0.21 for r/news suggests it frequently connects different topic clusters (e.g., from r/politics to r/worldnews).</div>
+                        <div class="comment-text">Yep. The top 15 subreddits alone (out of 67k) account for ~10% of all incoming hyperlinks. Mean in-degree is 5, max is 5,448. The average is meaningless as a "typical" value.</div>
                     </div>
                     <div class="analysis-note">
-                        <i class="fas fa-lightbulb"></i> <strong>Interpretation:</strong> A betweenness centrality of 0.21 is relatively high in this network (90th percentile). This implies that r/news plays a critical brokerage role – without it, information diffusion across the network would slow down significantly.
+                        <i class="fas fa-lightbulb"></i> <strong>Why this matters.</strong> A heavy-tailed degree distribution makes the network robust to random failures (deleting a random subreddit barely dents connectivity) but fragile to targeted attacks on the hubs. If r/askreddit or r/subredditdrama disappeared overnight, cross-community linking would look meaningfully different.
                     </div>
                 </div>
             </div>
 
-            <!-- POST 2 – Controversy & sentiment -->
+            <!-- POST 2 — Hubs vs bridges -->
             <div class="post-card">
                 <div class="post-header">
-                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/datascience</span>
-                    <span>• posted by u/TextMiner • 1 day ago</span>
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/Subreddit_Stats</span>
+                    <span>• posted by u/TopicalGraph • 1 day ago</span>
                 </div>
                 <div class="post-title">
-                    Controversial comments have a distinct linguistic signature
+                    Hubs and bridges on Reddit are two very different sets of subreddits
                 </div>
                 <div class="post-body">
-                    Using the controversy score (defined as (upvotes+downvotes)/max(upvotes,downvotes)), we identified comment threads with high disagreement. 
-                    Those threads contain 40% more negations and emotional language.
+                    Rank subreddits three ways and you get three different leaderboards. <strong>In-degree</strong> ≈ the old default front page (askreddit, iama, pics, funny, videos). <strong>Out-degree</strong> is dominated by meta and drama subs whose whole point is to point at other subs (bestof, subredditdrama, titlegore, drama, hailcorporate). <strong>Betweenness</strong> mixes the two, but the top bridges are <em>subredditdrama</em> (0.038) and <em>bestof</em> (0.033): exactly the subreddits that exist to route attention between otherwise-disconnected communities. r/the_donald and r/conspiracy show up in both the out-degree and betweenness top-15, which is what aggressive cross-cluster linking looks like.
                 </div>
                 <div class="post-stats">
                     <span><i class="fas fa-arrow-up"></i> 847 upvotes</span>
@@ -316,26 +335,30 @@
                 <div class="comments-section">
                     <div class="comment">
                         <div class="comment-author">u/StatsEnjoyer</div>
-                        <div class="comment-text">Interesting – did you control for subreddit topic? r/politics might be more controversial by nature.</div>
+                        <div class="comment-text">How fragmented is the network — are these "bridges" actually doing meaningful work?</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">u/TopicalGraph (OP)</div>
+                        <div class="comment-text">The largest weakly-connected component is <strong>97.7%</strong> of the graph, so the bridges aren't holding two halves together. But the strongly-connected core is only <strong>32%</strong>: most niche subs link out to bigger hubs but rarely get linked back.</div>
                     </div>
                     <div class="analysis-note">
-                        <i class="fas fa-lightbulb"></i> <strong>Analysis:</strong> After controlling for subreddit, the controversy score's correlation with negation words (like "not", "never", "wrong") is r = 0.43 (p < 0.01). This suggests that linguistic markers alone can predict disagreement, regardless of topic.
+                        <i class="fas fa-lightbulb"></i> <strong>Method note.</strong> Exact betweenness on 67k nodes is computationally infeasible; we use a k=500 vertex sample (NetworkX). This gives reliable rankings of the top hubs but not exact values. The numbers above are the sampled estimate.
                     </div>
                 </div>
             </div>
 
-            <!-- POST 3 – Degree distribution and network structure -->
+            <!-- POST 3 — Communities + TF-IDF -->
             <div class="post-card">
                 <div class="post-header">
-                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/complexsystems</span>
-                    <span>• posted by u/NetSciStudent • 3 days ago</span>
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/dataisbeautiful</span>
+                    <span>• posted by u/LouvainFan • 3 days ago</span>
                 </div>
                 <div class="post-title">
-                    The Reddit network follows a power-law degree distribution (scale-free)
+                    Six recognisable communities fall out of pure graph topology — no manual tagging
                 </div>
                 <div class="post-body">
-                    We computed both in-degree and out-degree for each subreddit. The distribution follows P(k) ~ k^{-2.3}, typical for social media.
-                    A few hubs (r/funny, r/AskReddit) connect to thousands of others.
+                    Build the positive-sentiment undirected projection (~287k edges), run Louvain, and modularity comes out to <strong>Q = 0.549</strong> across <strong>801 communities</strong>, well above the 0.3 threshold for "real structure". The top six are surprisingly clean: defaults+drama, gaming, politics, music/arts, science/STEM, europe/history. To label them we ran TF-IDF over the member <em>subreddit names</em> (the SNAP release doesn't include raw post text), splitting CamelCase and underscores into tokens. The distinctive tokens are exactly what you'd hope for: donald/trump/politics for the political cluster, battlefield/ps4/gaming for the gaming cluster, history/europe/eu for the geography cluster.
+                    <img src="figs/community_wordclouds.png" alt="TF-IDF wordclouds for the top 6 Louvain communities" class="post-fig">
                 </div>
                 <div class="post-stats">
                     <span><i class="fas fa-arrow-up"></i> 2.1k upvotes</span>
@@ -344,41 +367,49 @@
                 <div class="comments-section">
                     <div class="comment">
                         <div class="comment-author">u/PhysicistTurnedData</div>
-                        <div class="comment-text">So it's scale-free – does that mean it's robust to random failures but vulnerable to targeted attacks?</div>
+                        <div class="comment-text">Did you check whether subreddits cluster by friendliness too, not just topic?</div>
                     </div>
                     <div class="comment">
-                        <div class="comment-author">u/NetSciStudent (OP)</div>
-                        <div class="comment-text">Exactly! Removing top 5% hubs (like r/videos) fragments the network, while random removals have little effect.</div>
+                        <div class="comment-author">u/LouvainFan (OP)</div>
+                        <div class="comment-text">Polarity assortativity is close to zero (<strong>r ≈ 0.028</strong>). Communities are organised by what people post about, not by tone: friendly and slightly-less-friendly subs sit side by side inside the same cluster. The network ↔ text tie-in shows up later (next post), as within- vs across-community sentiment, not as assortativity.</div>
                     </div>
                     <div class="analysis-note">
-                        <i class="fas fa-lightbulb"></i> <strong>Finding:</strong> The exponent γ = 2.3 indicates a heavy-tailed distribution. The top 1% of subreddits account for 38% of all links – a classic "rich-get-richer" dynamic.
+                        <i class="fas fa-lightbulb"></i> <strong>What's striking.</strong> The labels emerged with zero external metadata. Louvain looks only at edge weights; TF-IDF looks only at subreddit names. The fact that one cluster screams "donald/trump/conspiracy" while another screams "science/space/brain" is a property of the linking behaviour itself.
                     </div>
                 </div>
             </div>
 
-            <!-- POST 4 – Topic modeling + network communities -->
+            <!-- POST 4 — Sentiment landscape + network-text tie-in -->
             <div class="post-card">
                 <div class="post-header">
-                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/LanguageTech</span>
-                    <span>• posted by u/MLexplorer • 5 days ago</span>
+                    <span class="subreddit"><i class="fab fa-reddit-alien"></i> r/AskSocialScience</span>
+                    <span>• posted by u/SentimentScout • 5 days ago</span>
                 </div>
                 <div class="post-title">
-                    Mapping text topics onto the network structure reveals 6 distinct communities
+                    Hostility on Reddit is rare (9.5%) but structured — and the language confirms it
                 </div>
                 <div class="post-body">
-                    Using LDA on post titles and comments, we identified 6 latent topics. When we overlay them onto the network (Louvain communities), the alignment is striking: Topic 1 (politics) is almost entirely within one network cluster.
+                    Across the whole 2014–2017 period only <strong>9.5%</strong> of hyperlinks are labeled negative-sentiment, and that share is almost flat (8.7 to 10.3% band), with no obvious spike around the 2016 US election. But the <em>where</em> matters: every one of the top 8 communities is friendlier internally than it is when linking out. The biggest within-vs-across gap is <strong>c26 (the NSFW/LGBT cluster)</strong> at <strong>+0.189</strong>, followed by politics at +0.073 and science at +0.064.
+                    <img src="figs/within_vs_across_sentiment.png" alt="Within- vs across-community sentiment polarity for the top 8 Louvain communities" class="post-fig">
+                    On the linguistic side, hostile posts look genuinely different from friendly ones: <strong>VADER compound</strong> averages <strong>−0.32</strong> for hostile vs <strong>+0.15</strong> for friendly (a sign flip and nearly half a unit on a [−1, +1] scale), and VADER-negative is roughly 4× higher in hostile posts.
+                    <img src="figs/liwc_hostile_vs_friendly.png" alt="Mean values of VADER positive/negative/compound, readability, and stopword fraction for hostile vs friendly hyperlinks" class="post-fig">
+                    <img src="figs/sentiment_over_time.png" alt="Share of negative-sentiment hyperlinks per month, 2014–2017" class="post-fig">
                 </div>
                 <div class="post-stats">
-                    <span><i class="fas fa-arrow-up"></i> 564 upvotes</span>
-                    <span><i class="fas fa-comment"></i> 45 comments</span>
+                    <span><i class="fas fa-arrow-up"></i> 1.4k upvotes</span>
+                    <span><i class="fas fa-comment"></i> 178 comments</span>
                 </div>
                 <div class="comments-section">
                     <div class="comment">
                         <div class="comment-author">u/NLP_Junkie</div>
-                        <div class="comment-text">How did you handle preprocessing? Reddit text is noisy.</div>
+                        <div class="comment-text">"Hostile-targeted" but polarity > +0.1: is that really hostile?</div>
+                    </div>
+                    <div class="comment">
+                        <div class="comment-author">u/SentimentScout (OP)</div>
+                        <div class="comment-text">Good catch: it's a <em>ranking</em>, not an absolute. Reddit linking is ~90% friendly overall, so even the most-hostile-targeted subs come out at positive polarity in absolute terms. The top of the leaderboard (againstmensrights, worstof, nolibswatch, gender_critical, blackladies, climateskeptics) is the kind of ideologically-charged community that attracts disproportionate critical linking.</div>
                     </div>
                     <div class="analysis-note">
-                        <i class="fas fa-lightbulb"></i> <strong>Method note:</strong> We used regex to remove markdown, user mentions, and URLs, then applied lemmatization. The coherence score (C_v=0.52) supports 6 topics. The political community has 89% of its posts classified as topic #1, confirming homophily.
+                        <i class="fas fa-lightbulb"></i> <strong>The tie-in.</strong> Communities discovered <em>purely from positive-edge topology</em> turn out to be exactly the communities that protect each other when criticised from outside. In-group is friendlier than out-group, by every measure we checked. Louvain modularity wasn't just finding topical clusters, it was finding social ones.
                     </div>
                 </div>
             </div>
@@ -387,31 +418,13 @@
 
     <footer>
         <p>
-            <i class="fab fa-github"></i> <a href="#">GitHub Repository</a> &nbsp;|&nbsp;
-            <i class="fas fa-chalkboard-user"></i> Project for Network Analysis & NLP &nbsp;|&nbsp;
-            Data: SNAP Reddit dataset (Stanford)
+            <i class="fab fa-github"></i> <a href="https://github.com/mikel-yu/02467_CSS_Project_B" target="_blank">GitHub Repository</a> &nbsp;|&nbsp;
+            <i class="fas fa-chalkboard-user"></i> 02467 Computational Social Science (DTU, Spring 2026) — Project B &nbsp;|&nbsp;
+            Data: <a href="https://snap.stanford.edu/data/soc-RedditHyperlinks.html" target="_blank">SNAP Reddit Hyperlinks</a> (Kumar et al., WWW 2018)
         </p>
         <p style="margin-top: 0.5rem;">
-            🔗 <strong>Explainer Notebook:</strong> <a href="https://nbviewer.org/gist/yourusername/your-notebook-gist" target="_blank">Full code, preprocessing, model selection, and discussion</a>
+            🔗 <strong>Explainer Notebook:</strong> <a href="https://nbviewer.org/github/mikel-yu/02467_CSS_Project_B/blob/main/Project_B_Explainer.ipynb" target="_blank">Full code, methods, and interpretation</a>
         </p>
     </footer>
-
-    <!-- Simple JavaScript to simulate download (you can replace with actual CSV later) -->
-    <script>
-        document.getElementById('downloadSampleBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            // Create a dummy CSV sample matching the SNAP dataset (replace with your actual data)
-            const csvContent = "source,target,weight\nr/funny,r/pics,342\nr/AskReddit,r/funny,189\nr/news,r/politics,514\nr/worldnews,r/news,278\nr/wholesomememes,r/MadeMeSmile,96";
-            const blob = new Blob([csvContent], {type: 'text/csv'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'reddit_sample_edges.csv';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-    </script>
 </body>
 </html>
