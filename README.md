@@ -5,7 +5,7 @@
 We map the [SNAP Reddit Hyperlinks](https://snap.stanford.edu/data/soc-RedditHyperlinks.html) dataset (Kumar et al., WWW 2018) into a directed subreddit-to-subreddit network and ask: do the communities that fall out of pure graph topology line up with the language of the linking posts?
 
 - **Website (public-facing):** https://mikel-yu.github.io/02467_CSS_Project_B/
-- **Explainer notebook (nbviewer):** https://nbviewer.org/github/mikel-yu/02467_CSS_Project_B/blob/main/Project_B_Explainer.ipynb
+- **Explainer notebook (GitHub):** https://github.com/Mikel-Yu/02467_CSS_Project_B/blob/main/Project_B_Explainer.ipynb
 
 ## Headline findings
 
